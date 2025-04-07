@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        PACKAGE = "nclient pandas ipaddress netaddr prettytable"
+        PACKAGE = "ncclient pandas ipaddress netaddr prettytable"
         SCRIPT = "netman_netconf_obj2.py"
         TEST = "unit_test_netman.py"
     }
