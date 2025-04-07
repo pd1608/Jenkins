@@ -1,20 +1,17 @@
 import unittest
 from napalm import get_network_driver
-from netmiko import ConnectHandler
 
 # Device credentials (update with actual info)
-
-
 expected_loopback_ip = "10.1.3.1/24"
 
 def get_loopback99_ip():
     device = {
-    'hostname': '198.51.100.13',
-    'username': 'lab',
-    'password': 'lab123',
-    'optional_args': {},
-    'driver': 'ios',  
-}
+        'hostname': '198.51.100.13',
+        'username': 'lab',
+        'password': 'lab123',
+        'optional_args': {},
+        'driver': 'ios',
+    }
     try:
         driver = get_network_driver(device['driver'])
         with driver(
@@ -41,12 +38,12 @@ def get_loopback99_ip():
 
 def get_ospf_instance_count():
     device = {
-    'hostname': '198.51.100.11',
-    'username': 'lab',
-    'password': 'lab123',
-    'optional_args': {},
-    'driver': 'ios',  
-}
+        'hostname': '198.51.100.11',
+        'username': 'lab',
+        'password': 'lab123',
+        'optional_args': {},
+        'driver': 'ios',
+    }
     try:
         driver = get_network_driver(device['driver'])
         with driver(
@@ -73,22 +70,34 @@ def get_ospf_instance_count():
     except Exception as e:
         print("Error fetching OSPF instance count:", e)
         return None
-    
+
 def ping_from_router():
     device = {
-    'hostname': '198.51.100.12',
-    'username': 'lab',
-    'password': 'lab123',
-    'optional_args': {},
-    'driver': 'ios',  
+        'hostname': '198.51.100.12',
+        'username': 'lab',
+        'password': 'lab123',
+        'optional_args': {},
+        'driver': 'ios',  # You can specify 'ios' or any other driver based on your device
     }
+
+    # Getting the network driver for the specific device
+    driver = get_network_driver(device['driver'])
+
     try:
-        with ConnectHandler(**device) as conn:
-            output = conn.send_command(f"ping ip 10.1.5.1 source 198.51.100.12")
-            print("Ping Output:\n", output)
-            if "Success rate is 100 percent" in output:
+        # Establish a connection to the device
+        with driver(device['hostname'], device['username'], device['password'], optional_args=device['optional_args']) as device_connection:
+            # Perform a ping test from the device
+            # Source IP is specified in the ping command parameters.
+            result = device_connection.ping('10.1.5.1', source='198.51.100.12')
+
+            # Check if the ping was successful (checking 'success' rate)
+            if result.get('success', 0) == 100:
+                print("Ping successful with 100% success rate.")
                 return True
-            return False
+            else:
+                print(f"Ping failed with {result.get('success', 0)}% success rate.")
+                return False
+
     except Exception as e:
         print("SSH/Ping Error:", e)
         return False
@@ -116,5 +125,3 @@ if __name__ == '__main__':
     unittest.main()
 
 
-
-   
