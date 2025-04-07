@@ -72,35 +72,21 @@ def get_ospf_instance_count():
         return None
 
 def ping_from_router():
-    device = {
-        'hostname': '198.51.100.12',
-        'username': 'lab',
-        'password': 'lab123',
-        'optional_args': {},
-        'driver': 'ios',  # You can specify 'ios' or any other driver based on your device
-    }
+    driver = get_network_driver("ios")
+    router = driver(
+        '198.51.100.12',
+        'lab',
+        'lab123')
+    
+    router.open()
 
-    # Getting the network driver for the specific device
-    driver = get_network_driver(device['driver'])
+    result = router.ping('10.1.5.1')
+    router.close()
 
-    try:
-        # Establish a connection to the device
-        with driver(device['hostname'], device['username'], device['password'], optional_args=device['optional_args']) as device_connection:
-            # Perform a ping test from the device
-            # Source IP is specified in the ping command parameters.
-            result = device_connection.ping('10.1.5.1', source='198.51.100.12')
-
-            # Check if the ping was successful (checking 'success' rate)
-            if result.get('success', 0) == 100:
-                print("Ping successful with 100% success rate.")
-                return True
-            else:
-                print(f"Ping failed with {result.get('success', 0)}% success rate.")
-                return False
-
-    except Exception as e:
-        print("SSH/Ping Error:", e)
-        return False
+    return isinstance(result,dict)
+    
+        
+ping_from_router()
 
 class TestRouterConfigNAPALM(unittest.TestCase):
 
