@@ -1,7 +1,7 @@
 import unittest
 from napalm import get_network_driver
 
-# Device credentials (update with actual info)
+
 expected_loopback_ip = "10.1.3.1/24"
 
 def get_loopback99_ip():
@@ -56,7 +56,7 @@ def get_ospf_instance_count():
             config = device_conn.get_config(retrieve='running')['running']
             ospf_instances = []
 
-            # Look for 'router ospf' declarations
+            
             for line in config.splitlines():
                 line = line.strip()
                 if line.startswith("router ospf"):
